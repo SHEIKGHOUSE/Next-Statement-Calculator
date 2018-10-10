@@ -21,6 +21,12 @@ import javax.swing.border.TitledBorder;
 import java.awt.Button;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -719,6 +725,34 @@ else if(Brnd.equals("LWI"))
 					**************End of the statement logic for both Non LWI and LWI*******************
 			     *******************************************************************************************/
 				}
+				String DailyM;
+				
+				String dataupdate="select DAILY_METRICS from sdfus where METRICS_DATE like sysdate";
+				//String data="update sdfus set DAILY_METRICS='"+i+"' where METRICS_DATE like sysdate;";
+			Connection con;
+			try {
+				con = DriverManager.getConnection("jdbc:oracle:thin:@demodatabase.cbgl9osqgrde.us-east-2.rds.amazonaws.com:1521:ORCL","sheik","hello123");
+				Statement st=(Statement) con.createStatement();
+				PreparedStatement ps = con.prepareStatement(dataupdate);
+				ResultSet rs = ps.executeQuery();
+				if (!rs.isBeforeFirst() ) {    
+					ps.executeQuery("insert into sdfus values (1,SYSDATE)");  
+			    }
+				if(rs.next())
+				{
+					DailyM=rs.getString("DAILY_METRICS");
+					int DM=Integer.parseInt(DailyM);
+					int i=DM+1;
+					System.out.println(i);
+					ps.executeQuery("update sdfus set DAILY_METRICS='"+i+"' where METRICS_DATE like sysdate");
+					//PreparedStatement ps1 = con.prepareStatement("update sdfus set DAILY_METRICS='"+i+"' where METRICS_DATE like sysdate");
+				}
+				
+				
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			}
 
 		});
